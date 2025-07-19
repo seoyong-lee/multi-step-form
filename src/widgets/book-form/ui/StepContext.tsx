@@ -15,6 +15,7 @@ export const useStepContext = () => {
   return ctx;
 };
 
+// Step Context 관리 - 브라우저 저장소에 저장
 export const StepProvider = ({ children }: { children: React.ReactNode }) => {
   const [stepData, setStepDataState] = useState<StepData>(() => {
     if (typeof window !== 'undefined') {
