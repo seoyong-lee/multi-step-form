@@ -1,8 +1,8 @@
-import '@/styles/globals.css';
+import '@/app/styles/globals.css';
 import type { AppProps } from 'next/app';
 import type { EmotionCache } from '@emotion/cache';
 import { CacheProvider } from '@emotion/react';
-import { emotionCache } from '@/lib/emotionCache';
+import { emotionCache } from '@/shared/lib/emotionCache';
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache;

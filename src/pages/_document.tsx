@@ -1,6 +1,6 @@
 import Document, { Html, Head, Main, NextScript, DocumentContext } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
-import { emotionCache } from '@/lib/emotionCache';
+import { emotionCache } from '@/shared/lib/emotionCache';
 
 export default class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
