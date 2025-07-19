@@ -3,6 +3,7 @@ import { StepNavigation } from './StepNavigation';
 import { useBookForm } from '../model/useBookForm';
 import { useRouter } from 'next/router';
 import { Step } from '@/features/steps';
+import { StepProvider } from './StepContext';
 
 export const BookForm = () => {
   const methods = useBookForm();
@@ -26,8 +27,10 @@ export const BookForm = () => {
     }
   };
   return (
-    <methods.FormProvider {...methods}>
-      <BookFormLayout stepContent={renderStep()} navigation={<StepNavigation step={step} />} />
-    </methods.FormProvider>
+    <StepProvider>
+      <methods.FormProvider {...methods}>
+        <BookFormLayout stepContent={renderStep()} navigation={<StepNavigation step={step} />} />
+      </methods.FormProvider>
+    </StepProvider>
   );
 };
