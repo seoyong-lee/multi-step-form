@@ -1,11 +1,9 @@
 import { useForm, FormProvider } from 'react-hook-form';
-import { formDefaultValues } from '../consts/form-default-values';
+import type { BookFormData } from '@/entities/book';
+import { formOptions } from '../consts/form-options';
 
 export const useBookForm = () => {
-  const methods = useForm({
-    defaultValues: formDefaultValues,
-    mode: 'onChange',
-  });
+  const methods = useForm<BookFormData>(formOptions);
 
   return {
     ...methods,
