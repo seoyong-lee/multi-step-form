@@ -1,13 +1,11 @@
-import { StepBasicInfo } from './StepBasicInfo';
-import { StepRating } from './StepRating';
-import { StepReview } from './StepReview';
-import { StepQuotes } from './StepQuotes';
-import { StepPublish } from './StepPublish';
+import { toPascalCase } from '@/shared/lib/toPascalCase';
+import { stepList } from '../consts/step-list';
 
-export const Step = {
-  BasicInfo: StepBasicInfo,
-  Rating: StepRating,
-  Review: StepReview,
-  Quotes: StepQuotes,
-  Publish: StepPublish,
-};
+export const Step = stepList.reduce(
+  (acc, step) => {
+    const pascalKey = toPascalCase(step.key); // 'basicInfo' -> 'BasicInfo'
+    acc[pascalKey] = step.component;
+    return acc;
+  },
+  {} as Record<string, React.ComponentType>,
+);

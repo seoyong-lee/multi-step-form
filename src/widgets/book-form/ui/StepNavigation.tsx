@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import { useRouter } from 'next/router';
+import { INITIAL_STEP, TOTAL_STEP } from '@/features/steps/consts/step-list';
 
 export const StepNavigation = ({ step }: { step: number }) => {
   const router = useRouter();
@@ -13,12 +14,12 @@ export const StepNavigation = ({ step }: { step: number }) => {
 
   return (
     <div css={containerStyles}>
-      {step > 1 && (
+      {step > INITIAL_STEP && (
         <button css={buttonStyles} onClick={() => goToStep(step - 1)}>
           이전
         </button>
       )}
-      {step < 5 && (
+      {step < TOTAL_STEP && (
         <button css={buttonStyles} onClick={() => goToStep(step + 1)}>
           다음
         </button>
