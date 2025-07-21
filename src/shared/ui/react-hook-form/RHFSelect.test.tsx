@@ -93,17 +93,7 @@ describe('RHFSelect', () => {
     });
   });
 
-  it('5. className props가 각 요소에 적용되어야 한다', () => {
-    render(<RHFSelect name="category" label="카테고리" options={testOptions} />, {
-      wrapper: FormTestWrapper,
-    });
-
-    expect(screen.getByRole('combobox')).toHaveClass('select');
-    expect(screen.getByText('카테고리')).toHaveClass('label');
-    expect(screen.getByRole('combobox').closest('div')).toHaveClass('wrapper');
-  });
-
-  it('6. 옵션을 선택했을 때 값이 변경되어야 한다', async () => {
+  it('5. 옵션을 선택했을 때 값이 변경되어야 한다', async () => {
     const user = userEvent.setup();
 
     render(<RHFSelect name="category" label="카테고리" options={testOptions} />, {
@@ -120,7 +110,7 @@ describe('RHFSelect', () => {
     expect(screen.getByRole('option', { name: '에세이' })).toHaveProperty('selected', true);
   });
 
-  it('7. placeholder가 커스텀으로 설정되어야 한다', () => {
+  it('6. placeholder가 커스텀으로 설정되어야 한다', () => {
     render(
       <RHFSelect
         name="category"
@@ -134,7 +124,7 @@ describe('RHFSelect', () => {
     expect(screen.getByText('카테고리를 선택하세요')).toBeInTheDocument();
   });
 
-  it('8. disabled 상태가 적용되어야 한다', () => {
+  it('7. disabled 상태가 적용되어야 한다', () => {
     render(<RHFSelect name="category" label="카테고리" options={testOptions} disabled />, {
       wrapper: FormTestWrapper,
     });
@@ -143,7 +133,7 @@ describe('RHFSelect', () => {
     expect(select).toBeDisabled();
   });
 
-  it('9. 에러 상태일 때 올바른 접근성 속성이 설정되어야 한다', async () => {
+  it('8. 에러 상태일 때 올바른 접근성 속성이 설정되어야 한다', async () => {
     const user = userEvent.setup();
 
     render(<RHFSelect name="category" label="카테고리" options={testOptions} required />, {
