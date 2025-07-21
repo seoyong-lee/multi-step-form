@@ -6,7 +6,7 @@ export const formOptions: UseFormProps<BookFormData> = {
   defaultValues: formDefaultValues,
 
   // 유효성 검사 모드
-  mode: 'onChange', // 입력 시마다 유효성 검사 수행 (입력할 때마다 즉시 검증)
+  mode: 'onSubmit', // 입력 시마다 유효성 검사 수행 (입력할 때마다 즉시 검증)
   reValidateMode: 'onChange', // 유효하지 않은 필드가 수정될 때마다 재검증
 
   // 에러 처리
