@@ -10,9 +10,9 @@ export interface Book {
    **/
   title: string;
   /*
-   * 도서 저자
+   * 출판일
    **/
-  author: string;
+  publicationDate: string;
   /*
    * 도서 상태
    **/

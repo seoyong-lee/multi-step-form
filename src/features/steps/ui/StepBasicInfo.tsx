@@ -2,16 +2,19 @@ import { BookStatus } from '@/entities/book';
 import { RHFSelect, RHFTextField } from '@/shared/ui/react-hook-form';
 import { useWatch } from 'react-hook-form';
 import { css } from '@emotion/react';
+import { useEndDateValidation } from '../model/useEndDateValidation';
+import { useStartDateValidation } from '../model/useStartDateValidation';
 
 export const StepBasicInfo = () => {
-  const readingStatus = useWatch({ name: 'readingStatus' }) as BookStatus;
+  useStartDateValidation();
+  useEndDateValidation();
+
+  const status = useWatch({ name: 'status' }) as BookStatus;
 
   const shouldShowStartDate =
-    readingStatus === BookStatus.READING ||
-    readingStatus === BookStatus.READ ||
-    readingStatus === BookStatus.PENDING;
+    status === BookStatus.READING || status === BookStatus.READ || status === BookStatus.PENDING;
 
-  const shouldShowEndDate = readingStatus === BookStatus.READ;
+  const shouldShowEndDate = status === BookStatus.READ;
 
   return (
     <section css={containerStyle}>
@@ -29,22 +32,21 @@ export const StepBasicInfo = () => {
           errorCss={errorStyle}
         />
       </div>
-
       <div css={formGroupStyle}>
         <RHFTextField
-          name="author"
-          label="저자"
-          placeholder="저자를 입력하세요"
+          name="publicationDate"
+          label="출판일"
+          placeholder="YYYY-MM-DD"
+          type="date"
           wrapperCss={fieldWrapperStyle}
           labelCss={labelStyle}
           inputCss={inputStyle}
           errorCss={errorStyle}
         />
       </div>
-
       <div css={formGroupStyle}>
         <RHFSelect
-          name="readingStatus"
+          name="status"
           label="독서 상태"
           required
           options={[
@@ -59,11 +61,10 @@ export const StepBasicInfo = () => {
           errorCss={errorStyle}
         />
       </div>
-
       {shouldShowStartDate && (
         <div css={formGroupStyle}>
           <RHFTextField
-            name="readingStartDate"
+            name="startDate"
             label="독서 시작일"
             placeholder="YYYY-MM-DD"
             type="date"
@@ -74,11 +75,10 @@ export const StepBasicInfo = () => {
           />
         </div>
       )}
-
       {shouldShowEndDate && (
         <div css={formGroupStyle}>
           <RHFTextField
-            name="readingEndDate"
+            name="endDate"
             label="독서 종료일"
             placeholder="YYYY-MM-DD"
             type="date"
