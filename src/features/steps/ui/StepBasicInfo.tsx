@@ -1,14 +1,11 @@
 import { BookStatus } from '@/entities/book';
 import { RHFSelect, RHFTextField } from '@/shared/ui/react-hook-form';
-import { useWatch } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { css } from '@emotion/react';
-import { useEndDateValidation } from '../model/useEndDateValidation';
-import { useStartDateValidation } from '../model/useStartDateValidation';
+import { validateEndDate, validateStartDate } from '../lib/validation';
 
 export const StepBasicInfo = () => {
-  useStartDateValidation();
-  useEndDateValidation();
-
+  const { getValues } = useFormContext();
   const status = useWatch({ name: 'status' }) as BookStatus;
 
   const shouldShowStartDate =
@@ -72,6 +69,7 @@ export const StepBasicInfo = () => {
             labelCss={labelStyle}
             inputCss={inputStyle}
             errorCss={errorStyle}
+            validate={startDate => validateStartDate(startDate, getValues)}
           />
         </div>
       )}
@@ -86,6 +84,7 @@ export const StepBasicInfo = () => {
             labelCss={labelStyle}
             inputCss={inputStyle}
             errorCss={errorStyle}
+            validate={endDate => validateEndDate(endDate, getValues)}
           />
         </div>
       )}
