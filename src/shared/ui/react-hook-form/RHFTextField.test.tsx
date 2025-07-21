@@ -64,17 +64,7 @@ describe('RHFTextField', () => {
   });
 
   it('4. className props가 각 요소에 적용되어야 한다', () => {
-    render(
-      <RHFTextField
-        name="title"
-        label="제목"
-        wrapperClassName="wrapper"
-        labelClassName="label"
-        inputClassName="input"
-        errorClassName="error"
-      />,
-      { wrapper: FormTestWrapper },
-    );
+    render(<RHFTextField name="title" label="제목" />, { wrapper: FormTestWrapper });
 
     expect(screen.getByLabelText('제목')).toHaveClass('input');
     expect(screen.getByText('제목')).toHaveClass('label');
