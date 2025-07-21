@@ -43,7 +43,6 @@ export const useBookForm = (step: number) => {
   };
 
   const handleNextStep: SubmitHandler<BookFormData> = async data => {
-    console.log(data);
     const isValid = await methods.trigger();
     if (isValid) {
       goToNextStep();
