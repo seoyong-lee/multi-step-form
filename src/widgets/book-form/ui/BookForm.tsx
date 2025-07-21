@@ -3,7 +3,7 @@ import { StepNavigation } from './StepNavigation';
 import { useBookForm } from '../model/useBookForm';
 import { useRouter } from 'next/router';
 import { StepProvider } from './StepContext';
-import { SwitchCase } from '@/shared/ui/SwitchCase';
+import { SwitchCase } from '@/shared/ui/switch-case';
 import { Step } from '@/features/steps';
 import { INITIAL_STEP } from '@/features/steps/consts/step-list';
 
