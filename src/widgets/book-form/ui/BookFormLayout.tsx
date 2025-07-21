@@ -32,6 +32,7 @@ const containerStyles = css`
 
 const mainStyles = css`
   flex: 1;
+  justify-content: center;
   padding: 24px;
 `;
 

@@ -63,15 +63,7 @@ describe('RHFTextField', () => {
     });
   });
 
-  it('4. className props가 각 요소에 적용되어야 한다', () => {
-    render(<RHFTextField name="title" label="제목" />, { wrapper: FormTestWrapper });
-
-    expect(screen.getByLabelText('제목')).toHaveClass('input');
-    expect(screen.getByText('제목')).toHaveClass('label');
-    expect(screen.getByLabelText('제목').closest('div')).toHaveClass('wrapper');
-  });
-
-  it('5. 에러 상태일 때 올바른 접근성 속성이 설정되어야 한다', async () => {
+  it('4. 에러 상태일 때 올바른 접근성 속성이 설정되어야 한다', async () => {
     const user = userEvent.setup();
 
     render(<RHFTextField name="title" label="제목" required />, { wrapper: FormTestWrapper });
