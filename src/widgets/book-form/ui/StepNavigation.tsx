@@ -14,24 +14,36 @@ export const StepNavigation = ({ step }: { step: number }) => {
 
   return (
     <div css={containerStyles}>
-      {step > INITIAL_STEP && (
-        <button css={buttonStyles} onClick={() => goToStep(step - 1)}>
-          이전
-        </button>
-      )}
-      {step < TOTAL_STEP && (
-        <button css={buttonStyles} onClick={() => goToStep(step + 1)}>
-          다음
-        </button>
-      )}
+      <div css={buttonContainerStyles}>
+        {step > INITIAL_STEP && (
+          <button css={buttonStyles} type="button" onClick={() => goToStep(step - 1)}>
+            이전
+          </button>
+        )}
+        {step < TOTAL_STEP && (
+          <button css={buttonStyles} type="submit">
+            다음
+          </button>
+        )}
+      </div>
     </div>
   );
 };
 
 const containerStyles = css`
   display: flex;
+  justify-content: center;
+  padding: 24px;
   gap: 16px;
   margin-top: 32px;
+`;
+
+const buttonContainerStyles = css`
+  display: flex;
+  justify-content: flex-end;
+  max-width: 600px;
+  width: 100%;
+  gap: 16px;
 `;
 
 const buttonStyles = css`

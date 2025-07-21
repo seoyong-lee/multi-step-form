@@ -6,7 +6,7 @@ export const formOptions: UseFormProps<BookFormData> = {
   defaultValues: formDefaultValues,
 
   // 유효성 검사 모드
-  mode: 'onChange', // 입력 시마다 유효성 검사 수행 (입력할 때마다 즉시 검증)
+  mode: 'onSubmit', // 입력 시마다 유효성 검사 수행 (입력할 때마다 즉시 검증)
   reValidateMode: 'onChange', // 유효하지 않은 필드가 수정될 때마다 재검증
 
   // 에러 처리
@@ -14,7 +14,7 @@ export const formOptions: UseFormProps<BookFormData> = {
   shouldFocusError: true, // 첫 번째 에러 필드에 자동 포커스
 
   // 필드 관리
-  shouldUnregister: false, // 언마운트된 필드 값 유지 (Step 간 이동 시 데이터 보존)
+  shouldUnregister: true, // 조건부 렌더링에서 숨겨진 필드 제거
   shouldUseNativeValidation: false, // HTML5 기본 검증 비활성화 (커스텀 UI 사용)
 
   // 리셋 옵션
