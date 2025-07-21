@@ -18,12 +18,7 @@ const Sidebar = () => {
 };
 
 export const BookFormLayout = ({ children }: BookFormLayoutProps) => {
-  return (
-    <div css={containerStyles}>
-      <main css={mainStyles}>{children}</main>
-      <aside css={asideStyles}></aside>
-    </div>
-  );
+  return <div css={containerStyles}>{children}</div>;
 };
 
 BookFormLayout.Content = Content;
@@ -31,6 +26,7 @@ BookFormLayout.Sidebar = Sidebar;
 
 const containerStyles = css`
   display: flex;
+  justify-content: space-between;
   min-height: 100vh;
 `;
 

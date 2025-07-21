@@ -5,27 +5,29 @@ type Props = {
   name: string;
   label: string;
   required?: boolean;
-  type?: string;
+  options: { label: string; value: string }[];
+
+  // 기본값 및 스타일링
   placeholder?: string;
   disabled?: boolean;
 
   // 커스터마이징용 CSS
   wrapperCss?: SerializedStyles;
   labelCss?: SerializedStyles;
-  inputCss?: SerializedStyles;
+  selectCss?: SerializedStyles;
   errorCss?: SerializedStyles;
 };
 
-export const RHFTextField = ({
+export const RHFSelect = ({
   name,
   label,
   required,
-  type = 'text',
-  placeholder,
+  options,
+  placeholder = '선택해주세요',
   disabled,
   wrapperCss,
   labelCss,
-  inputCss,
+  selectCss,
   errorCss,
 }: Props) => {
   const {
@@ -34,28 +36,32 @@ export const RHFTextField = ({
   } = useFormContext();
 
   const error = errors[name];
-  const inputId = `input-${name}`;
-  const describedBy = error ? `${inputId}-error` : undefined;
+  const selectId = `select-${name}`;
+  const describedBy = error ? `${selectId}-error` : undefined;
 
-  // 필수 여부에 따른 register 옵션 설정
-  const validationRules = required ? { required: `${label}은 필수 항목입니다.` } : {};
+  const validationRules = required ? { required: `${label}은 필수 선택 항목입니다.` } : {};
 
   return (
     <div css={wrapperCss}>
       {/* 입력 필드와 연결된 라벨 - 접근성을 위해 htmlFor에 input의 id를 연결 */}
-      <label htmlFor={inputId} css={labelCss}>
+      <label htmlFor={selectId} css={labelCss}>
         {label}
       </label>
-      <input
-        id={inputId}
-        type={type}
-        placeholder={placeholder}
+      <select
+        id={selectId}
         disabled={disabled}
         aria-invalid={!!error} // 접근성을 위한 유효성 여부 표시
         aria-describedby={describedBy} // 에러 메시지를 읽어줄 수 있도록 연결
-        css={inputCss}
+        css={selectCss}
         {...register(name, validationRules)} // react-hook-form의 register로 연결
-      />
+      >
+        <option value="">{placeholder}</option>
+        {options.map(({ value, label }) => (
+          <option key={value} value={value}>
+            {label}
+          </option>
+        ))}
+      </select>
       {error && (
         <span
           id={describedBy} // input의 aria-describedby가 이 span을 참조하도록 ID 부여
