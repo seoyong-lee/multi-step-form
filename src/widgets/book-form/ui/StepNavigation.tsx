@@ -16,12 +16,12 @@ export const StepNavigation = ({ step }: { step: number }) => {
     <div css={containerStyles}>
       <div css={buttonContainerStyles}>
         {step > INITIAL_STEP && (
-          <button css={buttonStyles} onClick={() => goToStep(step - 1)}>
+          <button css={buttonStyles} type="button" onClick={() => goToStep(step - 1)}>
             이전
           </button>
         )}
         {step < TOTAL_STEP && (
-          <button css={buttonStyles} onClick={() => goToStep(step + 1)}>
+          <button css={buttonStyles} type="submit">
             다음
           </button>
         )}

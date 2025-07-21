@@ -8,6 +8,7 @@ type Props = {
   type?: string;
   placeholder?: string;
   disabled?: boolean;
+  validate?: (value: string) => boolean | string;
 
   // 커스터마이징용 CSS
   wrapperCss?: SerializedStyles;
@@ -27,6 +28,7 @@ export const RHFTextField = ({
   labelCss,
   inputCss,
   errorCss,
+  validate,
 }: Props) => {
   const {
     register,
@@ -38,7 +40,11 @@ export const RHFTextField = ({
   const describedBy = error ? `${inputId}-error` : undefined;
 
   // 필수 여부에 따른 register 옵션 설정
-  const validationRules = required ? { required: `${label}은 필수 항목입니다.` } : {};
+  const validationRules = {
+    ...(required && { required: `${label}은 필수 항목입니다.` }),
+    ...(validate && { validate }),
+    shouldUnregister: true,
+  };
 
   return (
     <div css={wrapperCss}>
