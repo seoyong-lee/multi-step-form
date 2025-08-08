@@ -9,6 +9,8 @@ type Props = {
   placeholder?: string;
   disabled?: boolean;
   validate?: (value: string) => boolean | string;
+  multiline?: boolean;
+  rows?: number;
 
   // 커스터마이징용 CSS
   wrapperCss?: SerializedStyles;
@@ -24,6 +26,8 @@ export const RHFTextField = ({
   type = 'text',
   placeholder,
   disabled,
+  multiline = false,
+  rows = 4,
   wrapperCss,
   labelCss,
   inputCss,
@@ -52,16 +56,29 @@ export const RHFTextField = ({
       <label htmlFor={inputId} css={labelCss}>
         {label}
       </label>
-      <input
-        id={inputId}
-        type={type}
-        placeholder={placeholder}
-        disabled={disabled}
-        aria-invalid={!!error} // 접근성을 위한 유효성 여부 표시
-        aria-describedby={describedBy} // 에러 메시지를 읽어줄 수 있도록 연결
-        css={inputCss}
-        {...register(name, validationRules)} // react-hook-form의 register로 연결
-      />
+      {multiline ? (
+        <textarea
+          id={inputId}
+          placeholder={placeholder}
+          disabled={disabled}
+          rows={rows}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
+          css={inputCss}
+          {...register(name, validationRules)}
+        />
+      ) : (
+        <input
+          id={inputId}
+          type={type}
+          placeholder={placeholder}
+          disabled={disabled}
+          aria-invalid={!!error}
+          aria-describedby={describedBy}
+          css={inputCss}
+          {...register(name, validationRules)}
+        />
+      )}
       {error && (
         <span
           id={describedBy} // input의 aria-describedby가 이 span을 참조하도록 ID 부여

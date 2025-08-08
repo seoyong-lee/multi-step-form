@@ -38,6 +38,16 @@ const baseSchema = z.object({
     .string()
     .refine((date: string) => !date || isValidDate(date), '올바른 날짜 형식이 아닙니다.')
     .optional(),
+
+  // 2단계: 별점 (0~5, 0.5점 스케일)
+  rating: z
+    .number()
+    .min(0, '별점은 0점 이상이어야 합니다.')
+    .max(5, '별점은 5점 이하여야 합니다.')
+    .refine(rating => rating % 0.5 === 0, '별점은 0.5점 단위로 입력해주세요.'),
+
+  // 3단계: 독후감
+  review: z.string().optional(),
 });
 
 // BookForm 스키마 정의
@@ -80,6 +90,20 @@ export const bookFormSchema = baseSchema
     {
       message: '독서 종료일은 시작일보다 빠를 수 없습니다.',
       path: ['readingEndDate'],
+    },
+  )
+  .refine(
+    data => {
+      // 별점이 1점 또는 5점인 경우 독후감 필수
+      if (data.rating === 1 || data.rating === 5) {
+        return data.review && data.review.trim().length >= 100;
+      }
+      return true;
+    },
+    {
+      message:
+        '별점이 1점 또는 5점인 경우, 의견을 뒷받침하기 위해 최소 100자 이상의 독후감을 작성해주세요.',
+      path: ['review'],
     },
   );
 
