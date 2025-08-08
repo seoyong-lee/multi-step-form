@@ -1,48 +1,26 @@
-import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
+import { SubmitHandler } from 'react-hook-form';
 import type { BookFormData } from '@/entities/book';
 import { formOptions } from '../consts/form-options';
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { formDefaultValues } from '../consts/form-default-values';
+import { usePersistentForm } from './usePersistentForm';
+import { useStepNavigation } from './useStepNavigation';
 
-const getStepStorageKey = (step: number) => `step-data-${step}`;
+const getStepStorageKey = (step: number) => `book-form-step-${step}`;
 
 export const useBookForm = (step: number) => {
-  const router = useRouter();
   const storageKey = getStepStorageKey(step);
+  const { goToNextStep } = useStepNavigation();
 
-  const methods = useForm<BookFormData>({
-    ...formOptions,
-    defaultValues: formOptions.defaultValues,
+  // formOptions에서 defaultValues를 제외한 옵션들만 사용
+  const { defaultValues, ...otherOptions } = formOptions;
+
+  const methods = usePersistentForm<BookFormData>({
+    storageKey,
+    defaultValues: formDefaultValues,
+    ...otherOptions,
   });
 
-  // localStorage 값으로 reset
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(storageKey);
-      if (stored) {
-        methods.reset(JSON.parse(stored));
-      }
-    }
-  }, [methods, storageKey]);
-
-  useEffect(() => {
-    const subscription = methods.watch(values => {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(storageKey, JSON.stringify(values));
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [methods, storageKey]);
-
-  // 다음 스텝 이동 함수
-  const goToNextStep = () => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, step: step + 1 },
-    });
-  };
-
-  const handleNextStep: SubmitHandler<BookFormData> = async data => {
+  const handleNextStep: SubmitHandler<BookFormData> = async () => {
     const isValid = await methods.trigger();
     if (isValid) {
       goToNextStep();
