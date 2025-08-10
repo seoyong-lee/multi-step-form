@@ -4,10 +4,9 @@ import { useWatch } from 'react-hook-form';
 import { css } from '@emotion/react';
 
 export const StepBasicInfo = () => {
-  const status = useWatch<BookFormData, 'status'>({ name: 'status' });
+  const status = useWatch<BookFormData, 'readingStatus'>({ name: 'readingStatus' });
   const shouldShowStartDate =
     status === BookStatus.READING || status === BookStatus.READ || status === BookStatus.PENDING;
-
   const shouldShowEndDate = status === BookStatus.READ;
 
   return (
@@ -40,7 +39,7 @@ export const StepBasicInfo = () => {
       </div>
       <div css={formGroupStyle}>
         <RHFSelect
-          name="status"
+          name="readingStatus"
           label="독서 상태"
           required
           options={[
@@ -58,7 +57,7 @@ export const StepBasicInfo = () => {
       {shouldShowStartDate && (
         <div css={formGroupStyle}>
           <RHFTextField
-            name="startDate"
+            name="readingStartDate"
             label="독서 시작일"
             placeholder="YYYY-MM-DD"
             type="date"
@@ -72,7 +71,7 @@ export const StepBasicInfo = () => {
       {shouldShowEndDate && (
         <div css={formGroupStyle}>
           <RHFTextField
-            name="endDate"
+            name="readingEndDate"
             label="독서 종료일"
             placeholder="YYYY-MM-DD"
             type="date"

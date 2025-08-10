@@ -1,34 +1,39 @@
-import { SubmitHandler } from 'react-hook-form';
-import type { BookFormData } from '@/entities/book';
-import { formOptions } from '../consts/form-options';
-import { formDefaultValues } from '../consts/form-default-values';
-import { usePersistentForm } from './usePersistentForm';
-import { useStepNavigation } from './useStepNavigation';
+// useBookForm.ts
+import { zodResolver } from '@hookform/resolvers/zod';
 
-const getStepStorageKey = (step: number) => `book-form-step-${step}`;
+import { FORM_ROOT_KEY, stepKey } from '../consts/storage-keys';
+import { usePersistentZodForm } from './usePersistentZodForm';
+import { useStepNavigation } from './useStepNavigation';
+import { BookFormInput, createBookFormSchema } from '@/features/steps/lib/schema';
+import { defaultValues } from '../consts/form-default-values';
 
 export const useBookForm = (step: number) => {
-  const storageKey = getStepStorageKey(step);
   const { goToNextStep } = useStepNavigation();
+  const schema = createBookFormSchema(step);
 
-  // formOptions에서 defaultValues를 제외한 옵션들만 사용
-  const { defaultValues, ...otherOptions } = formOptions;
+  // useBookForm.ts
+  const stepFields: Record<number, (keyof BookFormInput)[]> = {
+    1: ['title', 'publicationDate', 'readingStatus', 'readingStartDate', 'readingEndDate'],
+    2: ['rating'],
+    3: ['review'],
+    4: ['quotes'],
+    5: ['isPublic'],
+  };
 
-  const methods = usePersistentForm<BookFormData>({
-    storageKey,
-    defaultValues: formDefaultValues,
-    ...otherOptions,
+  const methods = usePersistentZodForm<BookFormInput>({
+    defaultValues,
+    storageRootKey: FORM_ROOT_KEY,
+    storageStepKey: stepKey(step),
+    mode: 'onChange',
+    resolver: zodResolver(schema),
   });
 
-  const handleNextStep: SubmitHandler<BookFormData> = async () => {
-    const isValid = await methods.trigger();
-    if (isValid) {
-      goToNextStep();
-    }
+  // 다음 스텝 이동
+  const handleNextStep = async () => {
+    const fields = stepFields[step];
+    const ok = await methods.trigger(fields);
+    if (ok) goToNextStep();
   };
 
-  return {
-    ...methods,
-    handleNextStep,
-  };
+  return { ...methods, handleNextStep };
 };

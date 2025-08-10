@@ -3,6 +3,9 @@ import { parseISO, isValid } from 'date-fns';
 
 // 빈 문자열은 undefined로 처리 (선택 입력 필드에 유용)
 
+export const emptyToUndefinedOptional = (schema: z.ZodString) =>
+  z.preprocess(v => (typeof v === 'string' && v.trim() === '' ? undefined : v), schema.optional());
+
 export const emptyToUndefined = <T extends z.ZodString>(schema: T) =>
   z
     .union([z.string(), z.undefined()])

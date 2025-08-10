@@ -1,9 +1,9 @@
 import { UseFormProps } from 'react-hook-form';
-import type { BookFormData } from '@/entities/book';
-import { formDefaultValues } from './form-default-values';
+import { defaultValues } from './form-default-values';
+import { BookFormInput } from '@/features/steps/lib/schema';
 
-export const formOptions: UseFormProps<BookFormData> = {
-  defaultValues: formDefaultValues,
+export const formOptions: UseFormProps<BookFormInput> = {
+  defaultValues,
 
   // 유효성 검사 모드
   mode: 'onSubmit', // 입력 시마다 유효성 검사 수행 (입력할 때마다 즉시 검증)

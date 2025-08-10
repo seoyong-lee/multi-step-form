@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from 'react';
-import { formDefaultValues } from '../consts/form-default-values';
+import { defaultValues } from '../consts/form-default-values';
 import { StepData } from '../types/step-data';
 
 type StepContextType = {
@@ -20,9 +20,9 @@ export const StepProvider = ({ children }: { children: React.ReactNode }) => {
   const [stepData, setStepDataState] = useState<StepData>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('step-data');
-      return stored ? JSON.parse(stored) : formDefaultValues;
+      return stored ? JSON.parse(stored) : defaultValues;
     }
-    return formDefaultValues;
+    return defaultValues;
   });
 
   const setStepData = (data: StepData) => {

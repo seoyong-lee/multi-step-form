@@ -33,7 +33,7 @@ export const RHFSelect = ({
       name={name}
       control={control}
       rules={validationRules}
-      render={({ field: { onChange, onBlur, value, ref } }) => (
+      render={({ field: { onChange, onBlur, value } }) => (
         <Select
           {...restProps}
           name={name}

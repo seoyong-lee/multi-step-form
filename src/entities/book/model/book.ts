@@ -16,15 +16,15 @@ export interface Book {
   /*
    * 도서 상태
    **/
-  status: BookStatus;
+  readingStatus: BookStatus;
   /*
    * 시작 일자
    **/
-  startDate: string;
+  readingStartDate: string;
   /*
    * 종료 일자
    **/
-  endDate: string;
+  readingEndDate: string;
   /*
    * 별점
    **/

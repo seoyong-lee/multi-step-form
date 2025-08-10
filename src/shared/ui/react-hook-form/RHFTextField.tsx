@@ -1,10 +1,4 @@
-import {
-  useFormContext,
-  type FieldValues,
-  type Path,
-  type RegisterOptions,
-  get,
-} from 'react-hook-form';
+import { useFormContext, type FieldValues, type Path, type RegisterOptions } from 'react-hook-form';
 import { SerializedStyles } from '@emotion/react';
 
 type BaseProps<TFieldValues extends FieldValues> = {

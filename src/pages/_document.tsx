@@ -13,9 +13,9 @@ export default class MyDocument extends Document {
     // Next.js의 기본 렌더링 함수를 오버라이드, Emotion 캐시를 App 컴포넌트에 주입하는 방식으로 교체
     ctx.renderPage = () =>
       originalRenderPage({
-        enhanceApp: (App: any) => {
+        enhanceApp: App => {
           return function EnhanceApp(props) {
-            return <App emotionCache={cache} {...props} />;
+            return <App {...props} />;
           };
         },
       });
