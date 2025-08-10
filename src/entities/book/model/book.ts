@@ -41,6 +41,10 @@ export interface Book {
    * 공개 여부
    **/
   isPublic: boolean;
+  /*
+   * 전체 페이지 수
+   **/
+  totalPages: number;
 }
 
 /**

@@ -40,10 +40,12 @@ const readingStartDateSchema = isoDateStringOptional.optional();
 const readingEndDateSchema = isoDateStringOptional.optional();
 const publicationDateSchema = isoDateStringOptional.optional();
 
-// 전체 페이지 수: 입력은 문자열일 수 있으므로 empty→undefined 허용, 최소 1자(“입력됨” 보장)
-const totalPagesSchema = emptyToUndefinedOptional(
-  z.string().trim().min(1, { message: M.total_pages_required }),
-).optional();
+// 전체 페이지 수
+const totalPagesSchema = z
+  .number({ message: M.total_pages_required })
+  .int()
+  .min(1, { message: M.total_pages_required })
+  .optional();
 
 // 인용구 아이템(페이지는 숫자 또는 undefined로 RHF에서 정규화되어 온다고 가정)
 const quoteItemSchema = z.object({
@@ -66,7 +68,7 @@ type Data = {
   rating: number;
   review?: string;
   quotes?: { page?: number }[];
-  totalPages?: string; // 주의: 문자열(입력 원형 유지)
+  totalPages: number;
 };
 
 const parse = (s?: string) => (s ? parseISO(s) : undefined);

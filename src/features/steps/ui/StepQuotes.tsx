@@ -32,17 +32,14 @@ export const StepQuotes = () => {
         <p css={subtitleStyle}>책에서 인상 깊었던 구절이나 인용구를 등록해보세요.</p>
       </div>
 
-      <RHFTextField
+      <RHFNumberField
         name="totalPages"
         label="도서 전체 페이지 수"
         placeholder="도서의 전체 페이지 수를 입력해주세요 (예: 300)"
-        type="number"
-        rules={{
-          min: {
-            value: 1,
-            message: '페이지 수는 1 이상이어야 합니다.',
-          },
-        }}
+        min={1}
+        step={1}
+        integer
+        required
       />
       <p css={helpTextStyle}>인용구의 페이지 번호는 이 값보다 작아야 합니다.</p>
 

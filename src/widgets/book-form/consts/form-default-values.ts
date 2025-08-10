@@ -9,7 +9,7 @@ export const defaultValues: BookFormInput = {
   publicationDate: '',
   rating: 3,
   review: '',
-  totalPages: undefined,
+  totalPages: 0,
   quotes: [],
   isPublic: undefined,
 };

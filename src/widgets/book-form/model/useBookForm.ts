@@ -18,7 +18,7 @@ export const useBookForm = (step: number) => {
     1: ['title', 'publicationDate', 'readingStatus', 'readingStartDate', 'readingEndDate'],
     2: ['rating'],
     3: ['review'],
-    4: ['quotes'],
+    4: ['totalPages', 'quotes'],
     5: ['isPublic'],
   };
 
