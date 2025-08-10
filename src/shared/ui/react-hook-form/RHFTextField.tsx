@@ -1,8 +1,14 @@
-import { useFormContext } from 'react-hook-form';
+import {
+  useFormContext,
+  type FieldValues,
+  type Path,
+  type RegisterOptions,
+  get,
+} from 'react-hook-form';
 import { SerializedStyles } from '@emotion/react';
 
-type Props = {
-  name: string;
+type BaseProps<TFieldValues extends FieldValues> = {
+  name: Path<TFieldValues>;
   label: string;
   required?: boolean;
   type?: string;
@@ -12,6 +18,9 @@ type Props = {
   multiline?: boolean;
   rows?: number;
 
+  // react-hook-form 규칙을 그대로 전달 (minLength, pattern 등)
+  rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
+
   // 커스터마이징용 CSS
   wrapperCss?: SerializedStyles;
   labelCss?: SerializedStyles;
@@ -19,7 +28,7 @@ type Props = {
   errorCss?: SerializedStyles;
 };
 
-export const RHFTextField = ({
+export function RHFTextField<TFieldValues extends FieldValues>({
   name,
   label,
   required,
@@ -32,22 +41,20 @@ export const RHFTextField = ({
   labelCss,
   inputCss,
   errorCss,
-  validate,
-}: Props) => {
+  rules,
+}: BaseProps<TFieldValues>) {
   const {
     register,
     formState: { errors },
-  } = useFormContext();
+  } = useFormContext<TFieldValues>();
 
   const error = errors[name];
   const inputId = `input-${name}`;
   const describedBy = error ? `${inputId}-error` : undefined;
 
-  // 필수 여부에 따른 register 옵션 설정
-  const validationRules = {
+  const registerOptions: RegisterOptions<TFieldValues, Path<TFieldValues>> = {
     ...(required && { required: `${label}은 필수 항목입니다.` }),
-    ...(validate && { validate }),
-    shouldUnregister: true,
+    ...(rules || {}),
   };
 
   return (
@@ -65,7 +72,7 @@ export const RHFTextField = ({
           aria-invalid={!!error}
           aria-describedby={describedBy}
           css={inputCss}
-          {...register(name, validationRules)}
+          {...register(name, registerOptions)}
         />
       ) : (
         <input
@@ -76,7 +83,7 @@ export const RHFTextField = ({
           aria-invalid={!!error}
           aria-describedby={describedBy}
           css={inputCss}
-          {...register(name, validationRules)}
+          {...register(name, registerOptions)}
         />
       )}
       {error && (
@@ -90,4 +97,4 @@ export const RHFTextField = ({
       )}
     </div>
   );
-};
+}
