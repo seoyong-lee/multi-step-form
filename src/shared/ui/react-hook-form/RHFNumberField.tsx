@@ -67,7 +67,9 @@ export function RHFNumberField<TFieldValues extends FieldValues>({
     ...rules,
     valueAsNumber: true,
     setValueAs: v => {
-      if (v === '' || v === null || v === undefined) return allowEmpty ? undefined : undefined;
+      if (v === '' || v === null || v === undefined) {
+        return allowEmpty ? undefined : 0;
+      }
       const n = typeof v === 'string' ? Number(v) : v;
       if (!Number.isFinite(n)) return undefined; // NaN 방지
       return integer ? Math.trunc(n) : n;

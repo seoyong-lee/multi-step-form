@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { RHFSelect } from './RHFSelect';
@@ -13,7 +13,10 @@ const FormTestWrapper = ({
   onSubmit?: Parameters<ReturnType<typeof useForm>['handleSubmit']>[0];
   children: React.ReactNode;
 }) => {
-  const methods = useForm({ mode: 'onChange' });
+  const methods = useForm({
+    mode: 'onChange',
+    defaultValues: { category: '' },
+  });
   return (
     <FormProvider {...methods}>
       <form onSubmit={methods.handleSubmit(onSubmit ?? (() => {}))}>{children}</form>
@@ -65,8 +68,8 @@ describe('RHFSelect', () => {
     await user.selectOptions(select, 'novel');
     await user.selectOptions(select, '');
 
-    // 유효성 검사 수동 트리거
-    fireEvent.blur(select);
+    // 유효성 검사 수동 트리거 - blur 이벤트로 validation 실행
+    await user.tab(); // 다음 요소로 포커스 이동하여 blur 트리거
 
     // 에러 메시지가 나타날 때까지 대기
     await waitFor(() => {
@@ -75,22 +78,47 @@ describe('RHFSelect', () => {
   });
 
   it('4. form submit 시 required 검증이 동작해야 한다', async () => {
-    render(
-      <FormTestWrapper>
-        <RHFSelect name="category" label="카테고리" options={testOptions} required />
-        <button type="submit">제출</button>
-      </FormTestWrapper>,
-    );
+    const user = userEvent.setup();
+
+    const TestComponent = () => {
+      const methods = useForm({
+        mode: 'onChange',
+        defaultValues: { category: '' },
+      });
+
+      const handleSubmit = async () => {
+        // form submit 시 validation이 실행되도록 함
+        await methods.trigger('category');
+      };
+
+      return (
+        <FormProvider {...methods}>
+          <div>
+            <RHFSelect name="category" label="카테고리" options={testOptions} required />
+            <button type="button" onClick={handleSubmit}>
+              제출
+            </button>
+          </div>
+        </FormProvider>
+      );
+    };
+
+    render(<TestComponent />);
 
     const submitButton = screen.getByRole('button', { name: '제출' });
 
-    // 빈 상태에서 form 제출
-    fireEvent.click(submitButton);
+    // 빈 상태에서 validation 실행
+    await user.click(submitButton);
 
     // 에러 메시지가 나타날 때까지 대기
-    await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('카테고리은 필수 선택 항목입니다.');
-    });
+    await waitFor(
+      () => {
+        const errorElement = screen.getByRole('alert');
+        expect(errorElement).toBeInTheDocument();
+        expect(errorElement).toHaveTextContent('카테고리은 필수 선택 항목입니다.');
+      },
+      { timeout: 3000 },
+    );
   });
 
   it('5. 옵션을 선택했을 때 값이 변경되어야 한다', async () => {
@@ -145,6 +173,9 @@ describe('RHFSelect', () => {
     // validation 트리거
     await user.selectOptions(select, 'novel');
     await user.selectOptions(select, '');
+
+    // blur 이벤트로 validation 실행
+    await user.tab();
 
     await waitFor(() => {
       const errorMessage = screen.getByRole('alert');
