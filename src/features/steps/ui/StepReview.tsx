@@ -1,11 +1,12 @@
 import { useWatch, useFormContext } from 'react-hook-form';
 import { css } from '@emotion/react';
 import { RHFTextField } from '@/shared/ui/react-hook-form';
+import { BookFormData } from '@/entities/book';
 
 export const StepReview = () => {
   const { getValues } = useFormContext();
-  const rating = useWatch({ name: 'rating' }) as number;
-  const review = useWatch({ name: 'review' }) as string;
+  const rating = useWatch<BookFormData, 'rating'>({ name: 'rating' });
+  const review = useWatch<BookFormData, 'review'>({ name: 'review' });
 
   // rating이 undefined나 0인 경우에도 이전에 선택된 값이 있다면 유지
   const currentRating = rating || getValues('rating') || 0;

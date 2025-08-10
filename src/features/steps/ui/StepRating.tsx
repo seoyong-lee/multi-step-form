@@ -1,10 +1,11 @@
 import { useWatch, useFormContext } from 'react-hook-form';
 import { css } from '@emotion/react';
 import { useState } from 'react';
+import { BookFormData } from '@/entities/book';
 
 export const StepRating = () => {
   const { setValue } = useFormContext();
-  const rating = useWatch({ name: 'rating' }) as number;
+  const rating = useWatch<BookFormData, 'rating'>({ name: 'rating' });
   const [hoverRating, setHoverRating] = useState(0);
 
   const totalStars = 5;
