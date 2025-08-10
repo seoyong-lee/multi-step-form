@@ -18,7 +18,7 @@ export function useBookFormWithZod() {
       readingStartDate: '',
       readingEndDate: '',
       publicationDate: '',
-      rating: 0, // 기본값 필요 시 조정
+      rating: 3,
       review: '',
     },
   });
