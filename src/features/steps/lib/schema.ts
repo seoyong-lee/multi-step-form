@@ -1,4 +1,3 @@
-// schema.ts
 import { z } from 'zod';
 import { parseISO, isBefore, isAfter } from 'date-fns';
 import { BookStatus } from '@/entities/book';
@@ -7,13 +6,14 @@ import {
   fieldError,
   emptyToUndefinedOptional,
 } from '@/shared/lib/zodHelpers';
+import { M } from '../consts/messages';
 
-// Base fields
+// 필드 스키마
 const titleSchema = z
   .string()
   .trim()
-  .min(1, { message: '제목을 입력해주세요.' })
-  .max(100, { message: '제목은 100자 이하여야 합니다.' });
+  .min(1, { message: M.title_required })
+  .max(100, { message: M.title_max });
 
 const readingStatusSchema = z.union(
   [
@@ -22,107 +22,125 @@ const readingStatusSchema = z.union(
     z.literal(BookStatus.READ),
     z.literal(BookStatus.PENDING),
   ],
-  { message: '독서 상태를 선택해주세요.' },
+  { message: M.status_required },
 );
 
+// RHF에서 숫자 캐스팅을 하고 오므로 number 가정(별점은 필수)
 const ratingSchema = z
-  .number({ message: '별점을 입력해주세요.' })
-  .min(0, '별점은 0점 이상이어야 합니다.')
-  .max(5, '별점은 5점 이하여야 합니다.')
-  .refine(
-    n => Math.abs(n * 2 - Math.round(n * 2)) < Number.EPSILON,
-    '별점은 0.5점 단위로 입력해주세요.',
-  );
+  .number({ message: M.rating_required })
+  .min(0, M.rating_min)
+  .max(5, M.rating_max)
+  .refine(n => Math.abs(n * 2 - Math.round(n * 2)) < Number.EPSILON, M.rating_step);
 
+// 리뷰는 선택(빈 문자열 허용)
 const reviewSchema = emptyToUndefinedOptional(z.string().trim()).optional();
 
-// 도서 전체 페이지 수 스키마
+// 날짜 필드(키 자체 optional)
+const readingStartDateSchema = isoDateStringOptional.optional();
+const readingEndDateSchema = isoDateStringOptional.optional();
+const publicationDateSchema = isoDateStringOptional.optional();
+
+// 전체 페이지 수: 입력은 문자열일 수 있으므로 empty→undefined 허용, 최소 1자(“입력됨” 보장)
 const totalPagesSchema = emptyToUndefinedOptional(
-  z.string().trim().min(1, { message: '도서 전체 페이지 수를 입력해주세요.' }),
-);
+  z.string().trim().min(1, { message: M.total_pages_required }),
+).optional();
 
-// 인용구 스키마
+// 인용구 아이템(페이지는 숫자 또는 undefined로 RHF에서 정규화되어 온다고 가정)
 const quoteItemSchema = z.object({
-  text: z.string().trim().min(1, { message: '인용구를 입력해주세요.' }),
-  page: z.number().min(1, { message: '페이지 번호는 1 이상이어야 합니다.' }).optional(),
+  text: z.string().trim().min(1, { message: M.quote_text_required }),
+  page: z.number().min(1, { message: M.page_min1 }).optional(),
 });
-
 const quotesSchema = z.array(quoteItemSchema).optional();
 
-// isPublic 스키마 (string)
+// 공개 여부(폼 입력은 string 'true' | 'false' | undefined)
 const isPublicSchema = z
   .string()
-  .refine(val => val === 'true' || val === 'false', {
-    message: '공개 여부를 선택해주세요.',
-  })
+  .refine(v => v === 'true' || v === 'false', { message: M.is_public_required })
   .optional();
 
-// Main schema
+// 교차 검증 유틸
+type Data = {
+  readingStartDate?: string;
+  readingEndDate?: string;
+  publicationDate?: string;
+  rating: number;
+  review?: string;
+  quotes?: { page?: number }[];
+  totalPages?: string; // 주의: 문자열(입력 원형 유지)
+};
+
+const parse = (s?: string) => (s ? parseISO(s) : undefined);
+
+const checkStartAfterPublication = (data: Data, add: ReturnType<typeof fieldError>) => {
+  const start = parse(data.readingStartDate);
+  const pub = parse(data.publicationDate);
+  if (start && pub && isBefore(start, pub)) {
+    add(['readingStartDate'], M.start_after_pub);
+  }
+};
+
+const checkEndAfterStart = (data: Data, add: ReturnType<typeof fieldError>) => {
+  const start = parse(data.readingStartDate);
+  const end = parse(data.readingEndDate);
+  if (start && end && isAfter(start, end)) {
+    add(['readingEndDate'], M.end_after_start);
+  }
+};
+
+const checkReviewMinLengthIfExtremeRating =
+  (step: number | undefined) => (data: Data, add: ReturnType<typeof fieldError>) => {
+    const enforce = step === undefined ? true : step >= 3;
+    if (!enforce) return;
+    if (data.rating === 1 || data.rating === 5) {
+      const len = data.review?.trim().length ?? 0;
+      if (len < 100) add(['review'], M.review_min100);
+    }
+  };
+
+const checkQuotePagesRequiredIfMultiple = (data: Data, add: ReturnType<typeof fieldError>) => {
+  if (!data.quotes || data.quotes.length < 2) return;
+  data.quotes.forEach((q, i) => {
+    if (q.page === undefined) add(['quotes', i, 'page'], M.quotes_page_required);
+  });
+};
+
+const checkQuotePagesWithinTotal = (data: Data, add: ReturnType<typeof fieldError>) => {
+  if (!data.totalPages || !data.quotes) return;
+  const limit = Number(data.totalPages);
+  if (!Number.isFinite(limit)) return;
+  data.quotes.forEach((q, i) => {
+    if (q.page !== undefined && q.page > limit) {
+      add(['quotes', i, 'page'], M.quotes_page_lte_total(limit.toString()));
+    }
+  });
+};
+
+// 메인 스키마 (팩토리)
 export const createBookFormSchema = (step?: number) =>
   z
     .object({
       title: titleSchema,
       readingStatus: readingStatusSchema,
-      readingStartDate: isoDateStringOptional.optional(),
-      readingEndDate: isoDateStringOptional.optional(),
-      publicationDate: isoDateStringOptional.optional(),
+      readingStartDate: readingStartDateSchema,
+      readingEndDate: readingEndDateSchema,
+      publicationDate: publicationDateSchema,
       rating: ratingSchema,
       review: reviewSchema,
-      totalPages: totalPagesSchema.optional(),
+      totalPages: totalPagesSchema,
       quotes: quotesSchema,
       isPublic: isPublicSchema,
     })
     .superRefine((data, ctx) => {
-      const err = fieldError(ctx);
+      const add = fieldError(ctx);
 
-      const start = data.readingStartDate ? parseISO(data.readingStartDate) : undefined;
-      const end = data.readingEndDate ? parseISO(data.readingEndDate) : undefined;
-      const publication = data.publicationDate ? parseISO(data.publicationDate) : undefined;
+      // 교차 규칙들을 한 곳에 모아 순서대로 실행
+      const checks = [
+        checkStartAfterPublication,
+        checkEndAfterStart,
+        checkReviewMinLengthIfExtremeRating(step),
+        checkQuotePagesRequiredIfMultiple,
+        checkQuotePagesWithinTotal,
+      ] as const;
 
-      // 시작일 vs 출판일
-      if (start && publication && isBefore(start, publication)) {
-        err(['readingStartDate'], '독서 시작일은 출판일 이후여야 합니다.');
-      }
-
-      // 시작일 vs 종료일
-      if (start && end && isAfter(start, end)) {
-        err(['readingEndDate'], '독서 종료일은 시작일보다 빠를 수 없습니다.');
-      }
-
-      // 극단 평점 시 리뷰 100자: "리뷰 단계(3) 이후"에만
-      const enforceReview = step === undefined ? true : step >= 3;
-      if (enforceReview && (data.rating === 1 || data.rating === 5)) {
-        const len = data.review?.trim().length ?? 0;
-        if (len < 100) {
-          err(['review'], '최소 100자 이상 작성해주세요.');
-        }
-      }
-
-      // 인용구가 2개 이상일 때 페이지 번호 필수
-      if (data.quotes && data.quotes.length >= 2) {
-        data.quotes.forEach((quote, index) => {
-          if (quote.page === undefined) {
-            err(
-              ['quotes', index, 'page'],
-              '인용구가 2개 이상일 때는 모든 페이지 번호를 입력해야 합니다.',
-            );
-          }
-        });
-      }
-
-      // 인용구 페이지 번호가 도서 전체 페이지 수보다 작은지 검증
-      if (data.totalPages && data.quotes) {
-        data.quotes.forEach((quote, index) => {
-          if (quote.page && quote.page > Number(data.totalPages!)) {
-            err(
-              ['quotes', index, 'page'],
-              `페이지 번호는 도서 전체 페이지 수(${data.totalPages}페이지)보다 작아야 합니다.`,
-            );
-          }
-        });
-      }
+      checks.forEach(fn => fn(data as Data, add));
     });
-
-// 스키마 타입
-export type BookFormInput = z.input<ReturnType<typeof createBookFormSchema>>;
-export type BookFormOutput = z.output<ReturnType<typeof createBookFormSchema>>;

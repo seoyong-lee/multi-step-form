@@ -1,6 +1,6 @@
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { css } from '@emotion/react';
-import { BookFormInput } from '../lib/schema';
+import { BookFormInput } from '../types/book-form';
 import { RHFTextField } from '@/shared/ui/react-hook-form/RHFTextField';
 import { CharacterCount } from '@/shared/ui/count/CharacterCount';
 import { InfoMessage } from '@/shared/ui/info-message/InfoMessage';

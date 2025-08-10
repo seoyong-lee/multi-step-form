@@ -4,8 +4,9 @@ import { useRouter } from 'next/router';
 import { FORM_ROOT_KEY, stepKey } from '../consts/storage-keys';
 import { usePersistentZodForm } from './usePersistentZodForm';
 import { useStepNavigation } from './useStepNavigation';
-import { BookFormInput, createBookFormSchema } from '@/features/steps/lib/schema';
+import { createBookFormSchema } from '@/features/steps/lib/schema';
 import { defaultValues } from '../consts/form-default-values';
+import { BookFormInput } from '@/features/steps';
 
 export const useBookForm = (step: number) => {
   const { goToNextStep } = useStepNavigation();
@@ -36,12 +37,12 @@ export const useBookForm = (step: number) => {
     if (ok) goToNextStep();
   };
 
-  // 마지막 스텝에서 저장
+  // 마지막 스텝 저장
   const handleSave = async () => {
     const fields = stepFields[step];
     const ok = await methods.trigger(fields);
     if (ok) {
-      // 폼 데이터 저장 (여기에 실제 저장 로직 추가)
+      // TODO: 폼 데이터 저장 (여기에 실제 저장 로직 추가)
       console.log('폼 데이터 저장:', methods.getValues());
 
       // 저장 후 성공 페이지로 이동

@@ -1,5 +1,5 @@
 import { BookStatus } from '@/entities/book';
-import { BookFormInput } from '@/features/steps/lib/schema';
+import { BookFormInput } from '@/features/steps';
 
 export const defaultValues: BookFormInput = {
   title: '',

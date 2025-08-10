@@ -22,8 +22,6 @@ export function usePersistentZodForm<TInput extends FieldValues>({
     defaultValues,
   });
 
-  console.log(methods.formState.errors);
-
   // 1) 최초 로드: root → step 순으로 병합해서 reset
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -46,6 +44,8 @@ export function usePersistentZodForm<TInput extends FieldValues>({
 
   // 2) 변경 시 저장: root(누적 머지) + step(해당 스텝 스냅샷)
   const saving = useRef<number | null>(null);
+  const storageHealthy = useRef(true);
+
   useEffect(() => {
     const sub = methods.watch(values => {
       if (typeof window === 'undefined') return;
@@ -53,6 +53,9 @@ export function usePersistentZodForm<TInput extends FieldValues>({
       // 간단 디바운스
       if (saving.current) cancelAnimationFrame(saving.current);
       saving.current = requestAnimationFrame(() => {
+        if (!storageHealthy.current) {
+          return; // 한 번 망가지면 추가 시도 중단
+        }
         try {
           // root: 기존 root와 병합 저장
           const prevRoot = JSON.parse(localStorage.getItem(storageRootKey) || '{}');
@@ -61,8 +64,11 @@ export function usePersistentZodForm<TInput extends FieldValues>({
 
           // step: 해당 스텝 스냅샷
           localStorage.setItem(storageStepKey, JSON.stringify(values));
-        } catch {
-          // noop
+        } catch (e) {
+          if (process.env.NODE_ENV !== 'production') {
+            // 개발 환경에서만 1회 경고
+            console.warn('[usePersistentZodForm] localStorage save failed:', e);
+          }
         }
       });
     });

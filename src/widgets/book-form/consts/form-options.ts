@@ -1,6 +1,6 @@
 import { UseFormProps } from 'react-hook-form';
 import { defaultValues } from './form-default-values';
-import { BookFormInput } from '@/features/steps/lib/schema';
+import { BookFormInput } from '@/features/steps';
 
 export const formOptions: UseFormProps<BookFormInput> = {
   defaultValues,
