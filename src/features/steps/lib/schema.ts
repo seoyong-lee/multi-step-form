@@ -36,7 +36,18 @@ const ratingSchema = z
 
 const reviewSchema = emptyToUndefinedOptional(z.string().trim()).optional();
 
-const quotesSchema = emptyToUndefinedOptional(z.string().trim()).optional();
+// 도서 전체 페이지 수 스키마
+const totalPagesSchema = emptyToUndefinedOptional(
+  z.string().trim().min(1, { message: '도서 전체 페이지 수를 입력해주세요.' }),
+);
+
+// 인용구 스키마
+const quoteItemSchema = z.object({
+  text: z.string().trim().min(1, { message: '인용구를 입력해주세요.' }),
+  page: z.number().min(1, { message: '페이지 번호는 1 이상이어야 합니다.' }).optional(),
+});
+
+const quotesSchema = z.array(quoteItemSchema).optional();
 
 const isPublicSchema = z.boolean().optional();
 
@@ -46,11 +57,12 @@ export const createBookFormSchema = (step?: number) =>
     .object({
       title: titleSchema,
       readingStatus: readingStatusSchema,
-      readingStartDate: isoDateStringOptional,
-      readingEndDate: isoDateStringOptional,
-      publicationDate: isoDateStringOptional,
+      readingStartDate: isoDateStringOptional.optional(),
+      readingEndDate: isoDateStringOptional.optional(),
+      publicationDate: isoDateStringOptional.optional(),
       rating: ratingSchema,
       review: reviewSchema,
+      totalPages: totalPagesSchema.optional(),
       quotes: quotesSchema,
       isPublic: isPublicSchema,
     })
@@ -76,11 +88,32 @@ export const createBookFormSchema = (step?: number) =>
       if (enforceReview && (data.rating === 1 || data.rating === 5)) {
         const len = data.review?.trim().length ?? 0;
         if (len < 100) {
-          err(
-            ['review'],
-            '별점이 1점 또는 5점인 경우, 의견을 뒷받침하기 위해 최소 100자 이상의 독후감을 작성해주세요.',
-          );
+          err(['review'], '최소 100자 이상 작성해주세요.');
         }
+      }
+
+      // 인용구가 2개 이상일 때 페이지 번호 필수
+      if (data.quotes && data.quotes.length >= 2) {
+        data.quotes.forEach((quote, index) => {
+          if (quote.page === undefined) {
+            err(
+              ['quotes', index, 'page'],
+              '인용구가 2개 이상일 때는 모든 페이지 번호를 입력해야 합니다.',
+            );
+          }
+        });
+      }
+
+      // 인용구 페이지 번호가 도서 전체 페이지 수보다 작은지 검증
+      if (data.totalPages && data.quotes) {
+        data.quotes.forEach((quote, index) => {
+          if (quote.page && quote.page > Number(data.totalPages!)) {
+            err(
+              ['quotes', index, 'page'],
+              `페이지 번호는 도서 전체 페이지 수(${data.totalPages}페이지)보다 작아야 합니다.`,
+            );
+          }
+        });
       }
     });
 

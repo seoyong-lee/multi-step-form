@@ -3,6 +3,7 @@ import { css, SerializedStyles } from '@emotion/react';
 type CharacterCountProps = {
   current: number;
   min?: number;
+  max?: number;
   showCheckmark?: boolean;
   wrapperCss?: SerializedStyles;
   textCss?: SerializedStyles;
@@ -14,6 +15,7 @@ type CharacterCountProps = {
 export const CharacterCount = ({
   current,
   min = 0,
+  max,
   showCheckmark = true,
   wrapperCss,
   textCss,
@@ -21,7 +23,7 @@ export const CharacterCount = ({
   invalidCss,
   checkmarkCss,
 }: CharacterCountProps) => {
-  const isValid = current >= min;
+  const isValid = max ? current <= max : current >= min;
 
   return (
     // aria-live=polite 속성은 사용자가 하고 있는 작업을 방해하지 않고 적절한 타이밍에 변화를 읽어주도록 함
@@ -34,7 +36,7 @@ export const CharacterCount = ({
           isValid ? validCss : invalidCss,
         ]}
       >
-        {current} / {min}자
+        {current} / {max || min}자
       </span>
       {showCheckmark && isValid && <span css={[checkmarkStyle, checkmarkCss]}>✓</span>}
     </div>

@@ -1,5 +1,11 @@
-import { useFormContext, type FieldValues, type Path, type RegisterOptions } from 'react-hook-form';
-import { SerializedStyles } from '@emotion/react';
+import {
+  useFormContext,
+  type FieldValues,
+  type Path,
+  type RegisterOptions,
+  get,
+} from 'react-hook-form';
+import { css, SerializedStyles } from '@emotion/react';
 
 type BaseProps<TFieldValues extends FieldValues> = {
   name: Path<TFieldValues>;
@@ -42,7 +48,7 @@ export function RHFTextField<TFieldValues extends FieldValues>({
     formState: { errors },
   } = useFormContext<TFieldValues>();
 
-  const error = errors[name];
+  const error = get(errors, name as string);
   const inputId = `input-${name}`;
   const describedBy = error ? `${inputId}-error` : undefined;
 
@@ -52,9 +58,9 @@ export function RHFTextField<TFieldValues extends FieldValues>({
   };
 
   return (
-    <div css={wrapperCss}>
+    <div css={[fieldWrapperStyle, wrapperCss]}>
       {/* 입력 필드와 연결된 라벨 - 접근성을 위해 htmlFor에 input의 id를 연결 */}
-      <label htmlFor={inputId} css={labelCss}>
+      <label htmlFor={inputId} css={[labelStyle, labelCss]}>
         {label}
       </label>
       {multiline ? (
@@ -65,7 +71,7 @@ export function RHFTextField<TFieldValues extends FieldValues>({
           rows={rows}
           aria-invalid={!!error}
           aria-describedby={describedBy}
-          css={inputCss}
+          css={[inputStyle, inputCss]}
           {...register(name, registerOptions)}
         />
       ) : (
@@ -76,7 +82,7 @@ export function RHFTextField<TFieldValues extends FieldValues>({
           disabled={disabled}
           aria-invalid={!!error}
           aria-describedby={describedBy}
-          css={inputCss}
+          css={[inputStyle, inputCss]}
           {...register(name, registerOptions)}
         />
       )}
@@ -84,7 +90,7 @@ export function RHFTextField<TFieldValues extends FieldValues>({
         <span
           id={describedBy} // input의 aria-describedby가 이 span을 참조하도록 ID 부여
           role="alert" // 스크린 리더가 즉시 읽어주도록 알림 역할 부여
-          css={errorCss}
+          css={[errorStyle, errorCss]}
         >
           {error.message?.toString()}
         </span>
@@ -92,3 +98,40 @@ export function RHFTextField<TFieldValues extends FieldValues>({
     </div>
   );
 }
+
+const fieldWrapperStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const labelStyle = css`
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+`;
+
+const inputStyle = css`
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  color: #fff;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+const errorStyle = css`
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+`;

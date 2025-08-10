@@ -1,4 +1,3 @@
-// usePersistentZodForm.ts
 import { useEffect, useRef } from 'react';
 import { useForm, type UseFormProps, type UseFormReturn, type FieldValues } from 'react-hook-form';
 
@@ -6,7 +5,6 @@ type Options<TInput extends FieldValues> = {
   defaultValues: UseFormProps<TInput>['defaultValues'];
   storageRootKey: string;
   storageStepKey: string;
-  // ← resolver를 허용 (RHF의 타입 그대로)
   resolver?: UseFormProps<TInput>['resolver'];
 } & Omit<
   UseFormProps<TInput>,
@@ -23,6 +21,8 @@ export function usePersistentZodForm<TInput extends FieldValues>({
     ...formOptions,
     defaultValues,
   });
+
+  console.log(methods.formState.errors);
 
   // 1) 최초 로드: root → step 순으로 병합해서 reset
   useEffect(() => {

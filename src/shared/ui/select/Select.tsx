@@ -1,4 +1,4 @@
-import { SerializedStyles } from '@emotion/react';
+import { css, SerializedStyles } from '@emotion/react';
 
 export interface SelectOption {
   label: string;
@@ -58,9 +58,9 @@ export const Select = ({
   };
 
   return (
-    <div css={wrapperCss}>
+    <div css={[fieldWrapperStyle, wrapperCss]}>
       {label && (
-        <label htmlFor={selectId} css={labelCss}>
+        <label htmlFor={selectId} css={[labelStyle, labelCss]}>
           {label}
           {required && <span aria-label="필수"> *</span>}
         </label>
@@ -87,10 +87,28 @@ export const Select = ({
       </select>
 
       {hasError && (
-        <span id={describedBy} role="alert" css={errorCss}>
+        <span id={describedBy} role="alert" css={[errorStyle, errorCss]}>
           {error}
         </span>
       )}
     </div>
   );
 };
+
+const labelStyle = css`
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+`;
+
+const errorStyle = css`
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+`;
+
+const fieldWrapperStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
