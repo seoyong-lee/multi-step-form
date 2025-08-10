@@ -22,18 +22,26 @@ export const RHFSelect = ({
 }: RHFSelectProps) => {
   const {
     control,
-    formState: { errors },
+    formState: { errors, touchedFields },
   } = useFormContext();
 
   const error = errors[name];
-  const validationRules = required ? { required: `${label}은 필수 선택 항목입니다.` } : {};
+  const touched = touchedFields[name] || !!error;
+  const validationRules = required
+    ? {
+        required: {
+          value: true,
+          message: `${label}은 필수 선택 항목입니다.`,
+        },
+      }
+    : {};
 
   return (
     <Controller
       name={name}
       control={control}
       rules={validationRules}
-      render={({ field: { onChange, onBlur, value, ref } }) => (
+      render={({ field: { onChange, onBlur, value } }) => (
         <Select
           {...restProps}
           name={name}
@@ -46,7 +54,7 @@ export const RHFSelect = ({
           placeholder={placeholder}
           disabled={disabled}
           error={error?.message?.toString()}
-          touched={!!error}
+          touched={touched}
           wrapperCss={wrapperCss}
           labelCss={labelCss}
           selectCss={selectCss}

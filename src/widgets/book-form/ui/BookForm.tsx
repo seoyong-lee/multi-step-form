@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { StepProvider } from './StepContext';
 import { SwitchCase } from '@/shared/ui/switch-case';
 import { Step } from '@/features/steps';
-import { INITIAL_STEP } from '@/features/steps/consts/step-list';
+import { INITIAL_STEP, TOTAL_STEP } from '@/features/steps/consts/step-list';
 import { FormProvider } from 'react-hook-form';
 
 export const BookForm = () => {
@@ -13,12 +13,21 @@ export const BookForm = () => {
   const step = Number(router.query.step ?? INITIAL_STEP);
   const methods = useBookForm(step);
 
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (step === TOTAL_STEP) {
+      methods.handleSave();
+    } else {
+      methods.handleNextStep();
+    }
+  };
+
   return (
     <StepProvider>
       <FormProvider {...methods}>
         <BookFormLayout>
           <BookFormLayout.Content>
-            <form onSubmit={methods.handleSubmit(methods.handleNextStep)}>
+            <form onSubmit={handleFormSubmit}>
               <SwitchCase
                 value={step}
                 caseBy={{

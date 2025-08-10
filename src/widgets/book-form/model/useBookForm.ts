@@ -1,34 +1,54 @@
-import { SubmitHandler } from 'react-hook-form';
-import type { BookFormData } from '@/entities/book';
-import { formOptions } from '../consts/form-options';
-import { formDefaultValues } from '../consts/form-default-values';
-import { usePersistentForm } from './usePersistentForm';
-import { useStepNavigation } from './useStepNavigation';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/router';
 
-const getStepStorageKey = (step: number) => `book-form-step-${step}`;
+import { FORM_ROOT_KEY, stepKey } from '../consts/storage-keys';
+import { usePersistentZodForm } from './usePersistentZodForm';
+import { useStepNavigation } from './useStepNavigation';
+import { createBookFormSchema } from '@/features/steps/lib/schema';
+import { defaultValues } from '../consts/form-default-values';
+import { BookFormInput } from '@/features/steps';
 
 export const useBookForm = (step: number) => {
-  const storageKey = getStepStorageKey(step);
   const { goToNextStep } = useStepNavigation();
+  const router = useRouter();
+  const schema = createBookFormSchema(step);
 
-  // formOptions에서 defaultValues를 제외한 옵션들만 사용
-  const { defaultValues, ...otherOptions } = formOptions;
+  // useBookForm.ts
+  const stepFields: Record<number, (keyof BookFormInput)[]> = {
+    1: ['title', 'publicationDate', 'readingStatus', 'readingStartDate', 'readingEndDate'],
+    2: ['rating'],
+    3: ['review'],
+    4: ['totalPages', 'quotes'],
+    5: ['isPublic'],
+  };
 
-  const methods = usePersistentForm<BookFormData>({
-    storageKey,
-    defaultValues: formDefaultValues,
-    ...otherOptions,
+  const methods = usePersistentZodForm<BookFormInput>({
+    defaultValues,
+    storageRootKey: FORM_ROOT_KEY,
+    storageStepKey: stepKey(step),
+    mode: 'onChange',
+    resolver: zodResolver(schema),
   });
 
-  const handleNextStep: SubmitHandler<BookFormData> = async () => {
-    const isValid = await methods.trigger();
-    if (isValid) {
-      goToNextStep();
+  // 다음 스텝 이동
+  const handleNextStep = async () => {
+    const fields = stepFields[step];
+    const ok = await methods.trigger(fields);
+    if (ok) goToNextStep();
+  };
+
+  // 마지막 스텝 저장
+  const handleSave = async () => {
+    const fields = stepFields[step];
+    const ok = await methods.trigger(fields);
+    if (ok) {
+      // TODO: 폼 데이터 저장 (여기에 실제 저장 로직 추가)
+      console.log('폼 데이터 저장:', methods.getValues());
+
+      // 저장 후 성공 페이지로 이동
+      router.push('/success');
     }
   };
 
-  return {
-    ...methods,
-    handleNextStep,
-  };
+  return { ...methods, handleNextStep, handleSave };
 };

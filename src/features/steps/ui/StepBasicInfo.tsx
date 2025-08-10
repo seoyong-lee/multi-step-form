@@ -1,17 +1,12 @@
-import { BookStatus } from '@/entities/book';
+import { BookFormData, BookStatus } from '@/entities/book';
 import { RHFSelect, RHFTextField } from '@/shared/ui/react-hook-form';
 import { useWatch } from 'react-hook-form';
 import { css } from '@emotion/react';
-import { validateEndDate, validateStartDate } from '../lib/validation';
 
 export const StepBasicInfo = () => {
-  const status = useWatch({ name: 'status' }) as BookStatus;
-  const publicationDate = useWatch({ name: 'publicationDate' }) as string;
-  const startDate = useWatch({ name: 'startDate' }) as string;
-
+  const status = useWatch<BookFormData, 'readingStatus'>({ name: 'readingStatus' });
   const shouldShowStartDate =
     status === BookStatus.READING || status === BookStatus.READ || status === BookStatus.PENDING;
-
   const shouldShowEndDate = status === BookStatus.READ;
 
   return (
@@ -19,32 +14,14 @@ export const StepBasicInfo = () => {
       <h2 css={titleStyle}>1단계 - 도서 기본 정보</h2>
 
       <div css={formGroupStyle}>
-        <RHFTextField
-          name="title"
-          label="제목"
-          required
-          placeholder="책 제목을 입력하세요"
-          wrapperCss={fieldWrapperStyle}
-          labelCss={labelStyle}
-          inputCss={inputStyle}
-          errorCss={errorStyle}
-        />
+        <RHFTextField name="title" label="제목" required placeholder="책 제목을 입력하세요" />
       </div>
       <div css={formGroupStyle}>
-        <RHFTextField
-          name="publicationDate"
-          label="출판일"
-          placeholder="YYYY-MM-DD"
-          type="date"
-          wrapperCss={fieldWrapperStyle}
-          labelCss={labelStyle}
-          inputCss={inputStyle}
-          errorCss={errorStyle}
-        />
+        <RHFTextField name="publicationDate" label="출판일" placeholder="YYYY-MM-DD" type="date" />
       </div>
       <div css={formGroupStyle}>
         <RHFSelect
-          name="status"
+          name="readingStatus"
           label="독서 상태"
           required
           options={[
@@ -53,39 +30,25 @@ export const StepBasicInfo = () => {
             { label: '읽음', value: BookStatus.READ },
             { label: '보류 중', value: BookStatus.PENDING },
           ]}
-          wrapperCss={fieldWrapperStyle}
-          labelCss={labelStyle}
-          selectCss={selectStyle}
-          errorCss={errorStyle}
         />
       </div>
       {shouldShowStartDate && (
         <div css={formGroupStyle}>
           <RHFTextField
-            name="startDate"
+            name="readingStartDate"
             label="독서 시작일"
             placeholder="YYYY-MM-DD"
             type="date"
-            wrapperCss={fieldWrapperStyle}
-            labelCss={labelStyle}
-            inputCss={inputStyle}
-            errorCss={errorStyle}
-            validate={startDate => validateStartDate(startDate, publicationDate)}
           />
         </div>
       )}
       {shouldShowEndDate && (
         <div css={formGroupStyle}>
           <RHFTextField
-            name="endDate"
+            name="readingEndDate"
             label="독서 종료일"
             placeholder="YYYY-MM-DD"
             type="date"
-            wrapperCss={fieldWrapperStyle}
-            labelCss={labelStyle}
-            inputCss={inputStyle}
-            errorCss={errorStyle}
-            validate={endDate => validateEndDate(endDate, startDate)}
           />
         </div>
       )}
@@ -109,56 +72,4 @@ const titleStyle = css`
 
 const formGroupStyle = css`
   margin-bottom: 24px;
-`;
-
-const fieldWrapperStyle = css`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
-const labelStyle = css`
-  font-weight: 500;
-  color: #555;
-  font-size: 14px;
-`;
-
-const inputStyle = css`
-  padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  transition: border-color 0.2s ease;
-  color: #fff;
-
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-  }
-
-  &::placeholder {
-    color: #999;
-  }
-`;
-
-const selectStyle = css`
-  padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-  }
-`;
-
-const errorStyle = css`
-  color: #dc3545;
-  font-size: 12px;
-  margin-top: 4px;
 `;

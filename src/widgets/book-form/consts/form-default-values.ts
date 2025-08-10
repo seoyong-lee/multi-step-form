@@ -1,13 +1,15 @@
-import { BookFormData, BookStatus } from '@/entities/book';
+import { BookStatus } from '@/entities/book';
+import { BookFormInput } from '@/features/steps';
 
-export const formDefaultValues: BookFormData = {
+export const defaultValues: BookFormInput = {
   title: '',
+  readingStatus: undefined as unknown as BookStatus,
+  readingStartDate: '',
+  readingEndDate: '',
   publicationDate: '',
-  status: BookStatus.WANT_TO_READ,
-  startDate: '',
-  endDate: '',
-  rating: 0,
+  rating: 3,
   review: '',
+  totalPages: 0,
   quotes: [],
-  isPublic: false,
+  isPublic: undefined,
 };

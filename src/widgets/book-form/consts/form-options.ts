@@ -1,9 +1,9 @@
 import { UseFormProps } from 'react-hook-form';
-import type { BookFormData } from '@/entities/book';
-import { formDefaultValues } from './form-default-values';
+import { defaultValues } from './form-default-values';
+import { BookFormInput } from '@/features/steps';
 
-export const formOptions: UseFormProps<BookFormData> = {
-  defaultValues: formDefaultValues,
+export const formOptions: UseFormProps<BookFormInput> = {
+  defaultValues,
 
   // 유효성 검사 모드
   mode: 'onSubmit', // 입력 시마다 유효성 검사 수행 (입력할 때마다 즉시 검증)
@@ -14,7 +14,7 @@ export const formOptions: UseFormProps<BookFormData> = {
   shouldFocusError: true, // 첫 번째 에러 필드에 자동 포커스
 
   // 필드 관리
-  shouldUnregister: true, // 조건부 렌더링에서 숨겨진 필드 제거
+  shouldUnregister: false, // 조건부 렌더링에서 숨겨진 필드 유지 (데이터 보존을 위해)
   shouldUseNativeValidation: false, // HTML5 기본 검증 비활성화 (커스텀 UI 사용)
 
   // 리셋 옵션
