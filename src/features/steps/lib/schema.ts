@@ -49,7 +49,13 @@ const quoteItemSchema = z.object({
 
 const quotesSchema = z.array(quoteItemSchema).optional();
 
-const isPublicSchema = z.boolean().optional();
+// isPublic 스키마 (string)
+const isPublicSchema = z
+  .string()
+  .refine(val => val === 'true' || val === 'false', {
+    message: '공개 여부를 선택해주세요.',
+  })
+  .optional();
 
 // Main schema
 export const createBookFormSchema = (step?: number) =>

@@ -1,9 +1,11 @@
 import { css } from '@emotion/react';
 import { INITIAL_STEP, TOTAL_STEP } from '@/features/steps/consts/step-list';
 import { useStepNavigation } from '../model/useStepNavigation';
+import { useBookForm } from '../model/useBookForm';
 
 export const StepNavigation = ({ step }: { step: number }) => {
   const { goToPrevStep } = useStepNavigation();
+  const { handleSave } = useBookForm(step);
 
   return (
     <div css={containerStyles}>
@@ -13,9 +15,13 @@ export const StepNavigation = ({ step }: { step: number }) => {
             이전
           </button>
         )}
-        {step < TOTAL_STEP && (
+        {step < TOTAL_STEP ? (
           <button css={buttonStyles} type="submit">
             다음
+          </button>
+        ) : (
+          <button css={saveButtonStyles} type="button" onClick={handleSave}>
+            저장
           </button>
         )}
       </div>
@@ -45,4 +51,22 @@ const buttonStyles = css`
   border-radius: 4px;
   background-color: #676767;
   color: white;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #555;
+  }
+`;
+
+const saveButtonStyles = css`
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #218838;
+  }
 `;

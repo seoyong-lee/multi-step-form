@@ -11,4 +11,5 @@ export const defaultValues: BookFormInput = {
   review: '',
   totalPages: undefined,
   quotes: [],
+  isPublic: undefined,
 };

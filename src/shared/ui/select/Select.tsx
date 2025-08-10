@@ -76,7 +76,7 @@ export const Select = ({
         required={required}
         aria-invalid={hasError ? 'true' : 'false'}
         aria-describedby={describedBy}
-        css={selectCss}
+        css={[selectStyle, selectCss]}
       >
         <option value="">{placeholder}</option>
         {options.map(({ value, label }) => (
@@ -111,4 +111,19 @@ const fieldWrapperStyle = css`
   display: flex;
   flex-direction: column;
   gap: 8px;
+`;
+
+const selectStyle = css`
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+  }
 `;

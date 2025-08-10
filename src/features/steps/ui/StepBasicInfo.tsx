@@ -30,7 +30,6 @@ export const StepBasicInfo = () => {
             { label: '읽음', value: BookStatus.READ },
             { label: '보류 중', value: BookStatus.PENDING },
           ]}
-          selectCss={selectStyle}
         />
       </div>
       {shouldShowStartDate && (
@@ -73,19 +72,4 @@ const titleStyle = css`
 
 const formGroupStyle = css`
   margin-bottom: 24px;
-`;
-
-const selectStyle = css`
-  padding: 12px 16px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-
-  &:focus {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
-  }
 `;
